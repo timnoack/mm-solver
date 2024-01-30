@@ -1,0 +1,18 @@
+[submodule "libs/AMGX"]
+	path = libs/AMGX
+	url = https://github.com/NVIDIA/AMGX.git
+[submodule "libs/hypre"]
+	path = libs/hypre
+	url = https://github.com/hypre-space/hypre.git
+[submodule "libs/nlohman-json"]
+	path = libs/nlohman-json
+	url = https://github.com/nlohmann/json.git
+[submodule "libs/fast_matrix_market"]
+	path = libs/fast_matrix_market
+	url = https://github.com/alugowski/fast_matrix_market.git
+[submodule "libs/spdlog"]
+	path = libs/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "libs/CLI11"]
+	path = libs/CLI11
+	url = https://github.com/CLIUtils/CLI11.git

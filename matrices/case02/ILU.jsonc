@@ -1,0 +1,16 @@
+{
+    "solvers": {
+        "x": {
+            "type": "PBiCGStab",
+            "tolerance": 1e-10,
+            "preconditioner": {
+                "type": "ILU"
+            }
+        }
+    },
+    "solution": {
+        "matrix": "A.mtx",
+        "b": "b.mtx",
+        "x0": "x.mtx"
+    }
+}
