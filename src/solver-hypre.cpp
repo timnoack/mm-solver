@@ -111,25 +111,27 @@ void HypreSolver::setMatrixValues(HYPRE_IJMatrix &ij, const COOMatrix &coo) {
 #endif
 }
 
-void HypreSolver::setVectorValues(HYPRE_IJVector &ij, const COOVector &coo) {
+void HypreSolver::setVectorValues(HYPRE_IJVector &ij, const COOVector *coo,
+                                  double value) {
   // For each row, store the column indices and values in a map
   std::vector<HYPRE_BigInt> rows;
   std::vector<HYPRE_Real> vals;
-  rows.reserve(coo.rows.size());
-  vals.reserve(coo.rows.size());
+  int nrows = partitioning_[rank_ + 1] - partitioning_[rank_];
+  rows.reserve(nrows);
+  vals.reserve(nrows);
 
-  if (coo.rows.empty()) {
+  if (!coo || coo->rows.empty()) {
     // If no rows are given, set all values to zero
     for (auto row : localRows_) {
       rows.push_back(row);
-      vals.push_back(0.0);
+      vals.push_back(value);
     }
   } else {
-    for (int k = 0; k < coo.rows.size(); ++k) {
-      if (coo.rows[k] >= partitioning_[rank_] &&
-          coo.rows[k] < partitioning_[rank_ + 1]) {
-        rows.push_back(coo.rows[k]);
-        vals.push_back(coo.vals[k]);
+    for (int k = 0; k < coo->rows.size(); ++k) {
+      if (coo->rows[k] >= partitioning_[rank_] &&
+          coo->rows[k] < partitioning_[rank_ + 1]) {
+        rows.push_back(coo->rows[k]);
+        vals.push_back(coo->vals[k]);
       }
     }
   }
@@ -198,7 +200,7 @@ void HypreSolver::initVectorx(const COOVector &x) {
   } else {
     spdlog::info("Using zero initial guess");
   }
-  setVectorValues(x_, x);
+  setVectorValues(x_, &x);
 
   HYPRE_IJVectorAssemble(x_);
   HYPRE_IJVectorGetObject(x_, (void **)&par_x_);
@@ -216,7 +218,7 @@ void HypreSolver::initVectorb(const COOVector &b) {
   /* set vector values */
   if (b.rows.size() > 0) {
     spdlog::info("Using given RHS");
-    setVectorValues(b_, b);
+    setVectorValues(b_, &b);
     HYPRE_IJVectorAssemble(b_);
     HYPRE_IJVectorGetObject(b_, (void **)&par_b_);
   } else {
@@ -231,12 +233,7 @@ void HypreSolver::initVectorb(const COOVector &b) {
     HYPRE_IJVectorCreate(comm, jlower, jupper, &ones);
     HYPRE_IJVectorSetObjectType(ones, HYPRE_PARCSR);
     HYPRE_IJVectorInitialize(ones);
-    for (int i = 0; i < jupper - jlower + 1; ++i) {
-      int nrows = 1;
-      HYPRE_BigInt big_index = i + jlower;
-      double value = 1.0;
-      HYPRE_IJVectorSetValues(ones, nrows, &big_index, &value);
-    }
+    setVectorValues(ones, nullptr, 1.0);
     HYPRE_IJVectorAssemble(ones);
     HYPRE_IJVectorGetObject(ones, (void **)&par_ones);
 

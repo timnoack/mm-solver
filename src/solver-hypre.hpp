@@ -40,7 +40,8 @@ class HypreSolver : public Solver {
   void initSolver();
 
   void setMatrixValues(HYPRE_IJMatrix& ij, const COOMatrix& coo);
-  void setVectorValues(HYPRE_IJVector& ij, const COOVector& coo);
+  void setVectorValues(HYPRE_IJVector& ij, const COOVector* coo = nullptr,
+                       double value = 0.0);
 
  public:
   HypreSolver(const nlohmann::json& config);
