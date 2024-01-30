@@ -1,0 +1,14 @@
+{
+    "solvers": {
+        "x": {
+            "type": "PBiCGStab",
+            "relativeTolerance": 1e-9,
+            "preconditioner": {
+                "type": "ILU"
+            }
+        }
+    },
+    "solution": {
+        "matrix": "cfd2/cfd2.mtx"
+    }
+}
